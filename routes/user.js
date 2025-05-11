@@ -73,8 +73,6 @@ router.put('/profile', authMiddleware, upload.single('foto'), async (req, res) =
   }
 });
 
-module.exports = router;
-
 // Ambil profil
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
@@ -91,5 +89,33 @@ router.get('/profile', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil profil user' });
   }
 });
+router.post('/anak', authMiddleware, async (req, res) => {
+  try {
+    const googleId = req.user.id;
+    const user = await User.findOne({ googleId });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    const newAnak = new Anak({
+      user: user._id,  // Referensikan ke user
+      namaDepan: req.body.namaDepan,
+      namaBelakang: req.body.namaBelakang,
+      bulanLahir: req.body.bulanLahir,
+      tahunLahir: req.body.tahunLahir,
+      beratBadan: req.body.beratBadan,
+      tinggiBadan: req.body.tinggiBadan,
+      foto: req.body.foto,  // Bisa berupa URL atau base64
+    });
+
+    await newAnak.save();
+    res.json({ message: 'Anak berhasil ditambahkan', anak: newAnak });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal menambahkan anak' });
+  }
+});
+
 
 module.exports = router;

@@ -12,8 +12,8 @@ tinggiBadan: Number,
 usiaHamil: Number,
 status: {
 type: String,
-enum: ['aktif', 'nonaktif', 'menunggu-verifikasi'],//aduh ini lupa gimana
-default: 'menunggu-verifikasi'
+enum: ['Hamil', 'Menyusui', 'Tidak Hamil & Tidak Menyusui'],//aduh ini lupa gimana
+default: 'Tidak Hamil & Tidak Menyusui'
 },
 createdAt: { type: Date, default: Date.now }
 });
