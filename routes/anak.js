@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/user');
 const Anak = require('../models/anak');
+const Gizi = require('../models/gizi');
 const upload = require('../middleware/upload'); // Middleware upload foto
 
 // Menambahkan anak baru untuk user
@@ -37,7 +38,8 @@ router.post('/', authMiddleware, upload.single('foto'), async (req, res) => {
 });
 
 // Mengupdate data anak berdasarkan ID
-router.put('/id', authMiddleware, upload.single('foto'), async (req, res) => {
+router.put('/:id', authMiddleware, upload.single('foto'), async (req, res) => {
+
   try {
     const googleId = req.user.id;
     const user = await User.findOne({ googleId });
@@ -117,6 +119,60 @@ router.get('/:id', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Gagal mengambil data anak' });
+  }
+});
+router.post('/gizi/:anakId', authMiddleware, async (req, res) => {
+  try {
+    const googleId = req.user.id;
+    const user = await User.findOne({ googleId });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    const anak = await Anak.findOne({ _id: req.params.anakId, user: user._id });
+    if (!anak) return res.status(404).json({ message: 'Anak tidak ditemukan atau tidak milik user' });
+
+    const {
+      tanggal,
+      karbohidrat,
+      protein,
+      lemak,
+      serat,
+      vitamin,
+      mineral
+    } = req.body;
+
+    const giziBaru = new Gizi({
+      anak: anak._id,
+      tanggal,
+      karbohidrat,
+      protein,
+      lemak,
+      serat,
+      vitamin,
+      mineral
+    });
+
+    await giziBaru.save();
+    res.json({ message: 'Data gizi berhasil ditambahkan', gizi: giziBaru });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal menambahkan data gizi' });
+  }
+});
+router.get('/gizi/:anakId', authMiddleware, async (req, res) => {
+  try {
+    const googleId = req.user.id;
+    const user = await User.findOne({ googleId });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    const anak = await Anak.findOne({ _id: req.params.anakId, user: user._id });
+    if (!anak) return res.status(404).json({ message: 'Anak tidak ditemukan atau tidak milik user' });
+
+    const giziList = await Gizi.find({ anak: anak._id }).sort({ tanggal: -1 });
+
+    res.json({ anak: anak.namaDepan + ' ' + anak.namaBelakang, giziList });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data gizi' });
   }
 });
 
