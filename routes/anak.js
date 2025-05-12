@@ -3,39 +3,41 @@ const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/user');
 const Anak = require('../models/anak');
+const upload = require('../middleware/upload'); // Middleware upload foto
 
 // Menambahkan anak baru untuk user
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, upload.single('foto'), async (req, res) => {
   try {
     const googleId = req.user.id;
     const user = await User.findOne({ googleId });
-    console.log('User ID dari token:', req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User tidak ditemukan' });
     }
 
+    // Ambil data anak dari form-data
     const newAnak = new Anak({
-      user: user._id,  // Referensikan ke user
+      user: user._id, // Referensikan ke user
       namaDepan: req.body.namaDepan,
       namaBelakang: req.body.namaBelakang,
       bulanLahir: req.body.bulanLahir,
       tahunLahir: req.body.tahunLahir,
       beratBadan: req.body.beratBadan,
       tinggiBadan: req.body.tinggiBadan,
-      foto: req.body.foto,  // Bisa berupa URL atau base64
+      foto: req.file ? req.file.buffer.toString('base64') : null, // Jika ada foto, konversi ke base64
     });
 
+    // Simpan data anak
     await newAnak.save();
     res.json({ message: 'Anak berhasil ditambahkan', anak: newAnak });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Gagal menambaaahkan anak' });
+    res.status(500).json({ message: 'Gagal menambahkan anak' });
   }
 });
 
 // Mengupdate data anak berdasarkan ID
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/id', authMiddleware, upload.single('foto'), async (req, res) => {
   try {
     const googleId = req.user.id;
     const user = await User.findOne({ googleId });
@@ -44,6 +46,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'User tidak ditemukan' });
     }
 
+    // Cari anak berdasarkan ID dan pastikan anak ini milik user
     const updatedAnak = await Anak.findOneAndUpdate(
       { _id: req.params.id, user: user._id },
       {
@@ -53,7 +56,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
         tahunLahir: req.body.tahunLahir,
         beratBadan: req.body.beratBadan,
         tinggiBadan: req.body.tinggiBadan,
-        foto: req.body.foto,  // Bisa berupa URL atau base64
+        foto: req.file ? req.file.buffer.toString('base64') : req.body.foto, // Update foto jika ada
       },
       { new: true }
     );
