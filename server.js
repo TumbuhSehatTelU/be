@@ -19,6 +19,7 @@ app.use('/auth', require('./routes/auth'));   // Authentication routes
 app.use('/user', require('./routes/user'));   // User-related routes
 app.use('/home', require('./routes/home'));   
 app.use('/anak', require('./routes/anak'));   
+app.use('/chat', require('./routes/chat'));
 mongoose.connect(process.env.MONGO_URI, {
 useNewUrlParser: true,
 useUnifiedTopology: true
