@@ -9,7 +9,14 @@ dotenv.config();
 require('./config/passport');
 
 const app = express();
-app.use(cors());
+app.use(
+    cors({
+        credentials: true,
+        origin: ["http://localhost:50498", "https://berework-production.up.railway.app", "berework-production-1c3d.up.railway.app","http://10.0.2.2"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 app.use(morgan('dev'));
 app.use(express.json());
 
