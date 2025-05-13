@@ -175,5 +175,50 @@ router.get('/gizi/:anakId', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data gizi' });
   }
 });
+// Mengupdate data gizi berdasarkan ID
+router.put('/gizi/:anakId/:giziId', authMiddleware, async (req, res) => {
+  try {
+    const googleId = req.user.id;
+    const user = await User.findOne({ googleId });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+    const anak = await Anak.findOne({ _id: req.params.anakId, user: user._id });
+    if (!anak) return res.status(404).json({ message: 'Anak tidak ditemukan atau tidak milik user' });
+
+    const {
+      tanggal,
+      karbohidrat,
+      protein,
+      lemak,
+      serat,
+      vitamin,
+      mineral
+    } = req.body;
+
+    const updatedGizi = await Gizi.findOneAndUpdate(
+      { _id: req.params.giziId, anak: anak._id },
+      {
+        tanggal,
+        karbohidrat,
+        protein,
+        lemak,
+        serat,
+        vitamin,
+        mineral
+      },
+      { new: true }
+    );
+
+    if (!updatedGizi) {
+      return res.status(404).json({ message: 'Data gizi tidak ditemukan atau tidak milik anak' });
+    }
+
+    res.json({ message: 'Data gizi berhasil diperbarui', gizi: updatedGizi });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal memperbarui data gizi' });
+  }
+});
+
 
 module.exports = router;
