@@ -220,5 +220,22 @@ router.put('/gizi/:anakId/:giziId', authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/gizi/:anakId/:giziId', authMiddleware, async (req, res) => {
+  try {
+    const googleId = req.user.id;
+    const user = await User.findOne({ googleId });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
 
+    const anak = await Anak.findOne({ _id: req.params.anakId, user: user._id });
+    if (!anak) return res.status(404).json({ message: 'Anak tidak ditemukan atau tidak milik user' });
+
+    const gizi = await Gizi.findOne({ _id: req.params.giziId, anak: anak._id });
+    if (!gizi) return res.status(404).json({ message: 'Data gizi tidak ditemukan' });
+
+    res.json({ gizi });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil data gizi' });
+  }
+});
 module.exports = router;

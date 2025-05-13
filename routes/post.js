@@ -225,6 +225,30 @@ router.get('/:postId/komentar', async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil komentar' });
   }
 });
+router.get('/:postId/komentar/:komentarId', async (req, res) => {
+  try {
+    const { postId, komentarId } = req.params;
 
+    // Pastikan post ada
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post tidak ditemukan' });
+    }
+
+    // Ambil komentar berdasarkan ID dan pastikan milik post tersebut
+    const komentar = await Komentar.findOne({ _id: komentarId, post: postId })
+      .populate('user', 'namaDepan namaBelakang')  // Opsional: ambil data user
+      .populate('parent'); // Opsional: ambil data parent jika komentar adalah balasan
+
+    if (!komentar) {
+      return res.status(404).json({ message: 'Komentar tidak ditemukan' });
+    }
+
+    res.json({ komentar });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengambil komentar' });
+  }
+});
 
 module.exports = router;
