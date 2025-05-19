@@ -64,7 +64,7 @@ router.get('/google/dev', (req, res) => {
   const token = generateToken(dummyUser);
 
   res.json({
-    message: 'DEV login success',
+    message: 'DEV login success,ini cek github action deploy',
     user: dummyUser,
     token,
   });
