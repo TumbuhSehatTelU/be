@@ -34,5 +34,5 @@ useUnifiedTopology: true
 }).then(() => console.log('MongoDB connected'));
 
 app.listen(process.env.PORT, () => {
-console.log("server jalan,ini cek githubactions");
+console.log("server jalan,cacokkkk");
 });
