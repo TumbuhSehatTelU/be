@@ -1,9 +1,9 @@
-name: Deploy to Server
+name: Deploy to Server with Password
 
 on:
   push:
     branches:
-      - main  # Ganti jika branch kamu berbeda
+      - main
 
 jobs:
   deploy:
@@ -13,13 +13,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH with Password
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: azureuser  # Ganti jika bukan ini user VPS kamu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          debug: true  # Opsional, bantu lihat log detail saat error
+          username: azureuser
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          debug: true
           script: |
             echo "🔄 Navigating to project folder..."
             cd /home/azureuser/be
