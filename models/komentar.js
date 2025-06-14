@@ -6,5 +6,5 @@ const komentarSchema = new mongoose.Schema({
   komentar: String,  // Isi komentar
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'komentar', default: null },  // Komentar yang dibalas, null jika bukan balasan
 }, { timestamps: true });
-
+//a
 module.exports = mongoose.model('komentar', komentarSchema);
