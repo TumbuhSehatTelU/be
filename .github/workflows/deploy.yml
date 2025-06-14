@@ -17,13 +17,13 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: azureuser
+          username: ihear_fe
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           debug: true
           script: |
             echo "🔄 Navigating to project folder..."
-            cd /home/azureuser/be
+            cd /home/ihear_fe/be
 
             echo "🔄 Pulling latest code..."
             git pull origin main
