@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # Sesuaikan kalau branch kamu beda
+      - main  # Ganti jika branch kamu berbeda
 
 jobs:
   deploy:
@@ -17,8 +17,9 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: azureuser         # Ganti kalau username VPS kamu bukan ini
+          username: azureuser  # Ganti jika bukan ini user VPS kamu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          debug: true  # Opsional, bantu lihat log detail saat error
           script: |
             echo "🔄 Navigating to project folder..."
             cd /home/azureuser/be
@@ -35,3 +36,6 @@ jobs:
             echo "💾 Saving PM2 process..."
             pm2 save
             pm2 list
+
+            echo "✅ Deployment complete. Exiting."
+            exit 0
